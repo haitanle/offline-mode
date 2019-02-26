@@ -12,6 +12,7 @@ export default function IndexController(container) {
 }
 
 IndexController.prototype._registerServiceWorker = function() {
+  
   // TODO: register service worker
   if ('serviceWorker' in navigator) {
   // Register a service worker hosted at the root of the
@@ -24,7 +25,6 @@ IndexController.prototype._registerServiceWorker = function() {
   } else {
   console.log('Service workers are not supported.');
   }
-
 };
 
 // open a connection to the server for live updates

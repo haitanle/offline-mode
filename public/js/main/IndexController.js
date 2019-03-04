@@ -39,29 +39,38 @@ IndexController.prototype._registerServiceWorker = function() {
       return;
     }
 
-    // TODO: otherwise, listen for new installing workers arriving.
-    // If one arrives, track its progress.
-    // If it becomes "installed", call
-    // indexController._updateReady()
-    reg.addEventListener('updatefound', function(){
+    reg.addEventListener('updatefound', function() {
       indexController._trackInstalling(reg.installing);
     });
+  });
+
+  // TODO: listen for the controlling service worker changing
+  // and reload the page
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    window.location.reload();
   });
 };
 
 IndexController.prototype._trackInstalling = function(worker) {
   var indexController = this;
 
-  worker.addEventListener('statechange', function(){
-    if (worker.state == 'installed'){
-      indexController._updateReady();
+  worker.addEventListener('statechange', function() {
+    if (worker.state == 'installed') {
+      indexController._updateReady(worker);
     }
   });
 };
 
-IndexController.prototype._updateReady = function() {
+
+IndexController.prototype._updateReady = function(worker) {
   var toast = this._toastsView.show("New version available", {
-    buttons: ['whatever']
+    buttons: ['refresh', 'dismiss']
+  });
+
+  toast.answer.then(function(answer) {
+    if (answer != 'refresh') return;
+    // TODO: tell the service worker to skipWaiting
+    worker.postMessage({action: 'skipWaiting'});
   });
 };
 
